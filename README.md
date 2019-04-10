@@ -28,5 +28,6 @@ TODOs before using the scripts:
 * [Intall GCloud CLI](https://devopscube.com/setup-google-cloud-clisdk/) tool on your system.
 * `apt install jq xmllint`
 * `pip install beautifulsoup4`
+* For OS X, run `brew install coreutils`
 
 

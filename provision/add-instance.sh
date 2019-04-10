@@ -23,7 +23,7 @@ SSH() {
 }
 
 SCP() {
-    gcloud compute scp -r $1 $2
+    gcloud compute scp --recurse $1 $2
 }
 
 # print help and exit if not enough args given
@@ -53,7 +53,7 @@ log "VM external IP address is $VM_IP"
 SWITCH_IP=$(gcloud compute instances list | grep $SWITCH | awk '{ print $5 }')
 log "switch external IP address is $SWITCH_IP"
 log "updating scripts in switch"
-SCP scripts $NAME:~ || exit 1
+SCP scripts $SWITCH:~ || exit 1
 
 # wait until SSH up
 while [ true ]
@@ -71,7 +71,7 @@ done
 
 # copy ansible playbook to host
 log "updating scripts in VM"
-SCP scripts $VM_IP:~ || exit 1
+SCP scripts $NAME:~ || exit 1
 
 # install ansible
 SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible'
@@ -100,6 +100,6 @@ SSH $NAME "sudo ~/scripts/connect.sh $VM_INTERNAL_IP $VXLAN_KEY"
 log "set VM overlay IP to $OVERLAY_IP"
 SSH $NAME "sudo ~/scripts/set-ip.sh $OVERLAY_IP"
 
-
+log "Success!"
 
 
