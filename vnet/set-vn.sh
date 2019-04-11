@@ -77,7 +77,7 @@ bridge_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/re
 
 log "Bridge on $vn_name is called: $bridge_name"
 
-interface_num=$(( $( curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r '.vtns | .[] | .[] | select(.name=="vtn1") | .vbridge | .[0] | .vinterface | .[] | .name' | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort | tail -n 1 ) + 1 ))
+interface_num=$(( $( curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .vinterface | .[] | .name" | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort | tail -n 1 ) + 1 ))
 
 iface_name="${vn_name}i$interface_num"
 

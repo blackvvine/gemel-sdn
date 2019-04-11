@@ -94,7 +94,7 @@ log "establishing VM to switch link"
 SSH $NAME "sudo ~/scripts/connect.sh $SW_INTERNAL_IP $VXLAN_KEY"
 
 log "establishing switch to VM link"
-SSH $NAME "sudo ~/scripts/connect.sh $VM_INTERNAL_IP $VXLAN_KEY"
+SSH $SWITCH "sudo ~/scripts/connect.sh $VM_INTERNAL_IP $VXLAN_KEY"
 
 # set overlay IP
 log "set VM overlay IP to $OVERLAY_IP"
