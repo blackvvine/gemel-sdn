@@ -1,6 +1,8 @@
 Gemel SDN
 =========
 
+![Egyptian man's best friend](https://answersafrica.com/wp-content/uploads/2013/08/camel-teeth.jpg)
+
 This repository contains scrtipts for provisioning and managing resources on Gemel. The componenets are:
 
 VNet
