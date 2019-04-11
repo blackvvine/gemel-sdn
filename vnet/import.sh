@@ -4,5 +4,6 @@ ODL_API_USER=admin
 ODL_API_PASS=admin
 
 log() {
-    echo "$(date --rfc-3339="seconds") :: INFO :: $@"
+    echo "$(date) :: INFO :: $@"
+    # echo "$(date --rfc-3339="seconds") :: INFO :: $@"
 }

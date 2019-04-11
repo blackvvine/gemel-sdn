@@ -19,7 +19,7 @@ fi
 while getopts "h?i:n:f:" opt; do
     case "$opt" in
     h|\?)
-        print_help 
+        print_help
         exit 0
         ;;
     i)  gcp_name=$OPTARG
@@ -35,7 +35,10 @@ then
     exit 1
 fi
 
-echo "Adding host $gcp_name to VN $vn_name"
+log "Adding host $gcp_name to VN $vn_name"
+
+log "Pinging to let controller know we exist"
+host_mac=$(gcloud compute ssh $gcp_name -- ping -c5 210.0.0.101)
 
 host_mac=$(gcloud compute ssh $gcp_name -- bash -c 'ifconfig | grep br0 | grep -oE "(.{2}:){5}.{2}"')
 
@@ -52,7 +55,7 @@ vxlan_key=$(gcloud compute ssh $gcp_name -- sudo ovs-vsctl show | grep -oE 'key=
 
 log "VXLAN key is $vxlan_key"
 
-switch_gcp_name=$(gcloud compute instances list | grep $switch_ip | awk '{print $1}')
+switch_gcp_name=$(gcloud compute instances list | grep -E "$switch_ip" | awk '{print $1}')
 
 log "switch VM name is \"$switch_gcp_name\""
 
@@ -86,7 +89,7 @@ curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
     || exit 1
 
-echo 
+echo
 
 log "iface $iface_name created."
 
