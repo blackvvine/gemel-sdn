@@ -8,11 +8,11 @@ fi
 
 if [[ -z "$2" ]]
 then 
-	echo "Second arg should be key (recommendation: $(( $( ovs-vsctl show | grep -oE 'key="[0-9]+"' | grep -oE "[0-9]+" | sort | tail -n 1 ) + 1 )))"
+	echo "Second arg should be key (recommendation: $(( $( ovs-vsctl show | grep -oE 'key="[0-9]+"' | grep -oE "[0-9]+" | sort -n | tail -n 1 ) + 1 )))"
 	exit 1
 fi
 
-vxname=vx$(( $(ovs-vsctl show | grep -Ei 'vx[0-9]' | grep -oEi '[0-9]' | sort | uniq | tail -n 1) + 1 ))
+vxname=vx$(( $(ovs-vsctl show | grep -Ei 'vx[0-9]+' | grep -oEi '[0-9]+' | sort -n | uniq | tail -n 1) + 1 ))
 remoteip="$1"
 key="$2"
 
