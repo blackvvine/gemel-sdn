@@ -81,7 +81,7 @@ log "updating scripts in VM"
 SCP scripts $NAME:~ || exit 1
 
 # install ansible
-SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible'
+SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible -y'
 SSH $NAME 'sudo apt update'
 SSH $NAME 'sudo apt install -y ansible'
 

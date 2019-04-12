@@ -7,9 +7,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [[ $(uname) == "Linux" ]]
 then
-    curl -u $ODL_API_USER:$ODL_API_PASS -H "Accept: application/xml" "$ODL_API_URL/restconf/operational/network-topology:network-topology/" | xmllint --format - | dd status=none of=$DIR/out.xml
+    curl --silent -u $ODL_API_USER:$ODL_API_PASS -H "Accept: application/xml" "$ODL_API_URL/restconf/operational/network-topology:network-topology/" | xmllint --format - | dd status=none of=$DIR/out.xml
 else
-    curl -u $ODL_API_USER:$ODL_API_PASS -H "Accept: application/xml" "$ODL_API_URL/restconf/operational/network-topology:network-topology/" | xmllint --format - | dd of=$DIR/out.xml
+    curl --silent -u $ODL_API_USER:$ODL_API_PASS -H "Accept: application/xml" "$ODL_API_URL/restconf/operational/network-topology:network-topology/" | xmllint --format - | dd of=$DIR/out.xml
 fi
 
 

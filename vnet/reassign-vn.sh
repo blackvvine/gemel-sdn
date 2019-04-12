@@ -65,13 +65,13 @@ log "VM ingress port is interface \"$switch_port\" @ $switch_gcp_name"
 bash $DIR/get_topology.sh
 
 # extract openflow ID of switch from topology API results
-ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")"
+ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")" || exit 1
 switch_id=$(echo "$ids" | tail -n 1)
 
 log "OpenFlow ID of the switch is $switch_id"
 
 log "Finding current virtual network"
-vn_name=$(curl --user $ODL_API_USER:$ODL_API_PASS -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ \
+vn_name=$(curl --silent --user $ODL_API_USER:$ODL_API_PASS -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ \
           | jq -r ".vtns.vtn[] | select(.vbridge[] | .vinterface[] | .[\"port-map-config\"][\"node\"] == \"$switch_id\" and .[\"port-map-config\"][\"port-name\"] == \"$switch_port\") | .name" | uniq)
 
 log "current network is $vn_name"
@@ -81,18 +81,18 @@ log "current network is $vn_name"
 
 # ============================================================== #
 
-new_brdige=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$new_vn\") | .vbridge | .[0] | .name")
+new_brdige=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$new_vn\") | .vbridge | .[0] | .name")
 
 log "Bridge on $new_vn is called: $new_brdige"
 
-interface_num=$(( $( curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$new_vn\") | .vbridge | .[0] | .vinterface | .[] | .name" | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort -n | tail -n 1 ) + 1 ))
+interface_num=$(( $( curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$new_vn\") | .vbridge | .[0] | .vinterface | .[] | .name" | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort -n | tail -n 1 ) + 1 ))
 
 new_iface="${new_vn}i$interface_num"
 
 log "New interface will be called $new_iface"
 
 # create new interface
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     $ODL_API_URL/restconf/operations/vtn-vinterface:update-vinterface \
     -d "{\"input\":{\"tenant-name\":\"$new_vn\", \"bridge-name\":\"$new_brdige\", \"interface-name\":\"$new_iface\"}}" \
     || exit 1
@@ -103,12 +103,12 @@ log "iface $new_iface created on $new_vn."
 
 # ============================================================== #
 
-bridge_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
+bridge_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
 
 log "Bridge on $vn_name is called: $bridge_name"
 
 # find interface
-iface_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET \
+iface_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET \
     $ODL_API_URL/restconf/operational/vtn:vtns/ | \
     jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .vinterface | .[] | select(.[\"port-map-config\"].node==\"$switch_id\" and .[\"port-map-config\"][\"port-name\"]==\"$switch_port\") | .name")
 
@@ -117,10 +117,10 @@ log "interface to be unmapped is: $iface_name"
 echo 
 
 # unmap from current vn
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     "$ODL_API_URL/restconf/operations/vtn-port-map:remove-port-map" \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
-    || exit 1
+    || crash
 
 echo
 
@@ -128,10 +128,12 @@ start_time=$(date +%s%N)
 
 log "interface unmapped successfully"
 
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+log "Map to new interface $new_iface"
+
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     "$ODL_API_URL/restconf/operations/vtn-port-map:set-port-map" \
-    -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\", \"node\":\"$switch_id\", \"port-name\":\"$switch_port\"}}" \
-    || exit 1
+    -d "{\"input\":{\"tenant-name\":\"$new_vn\", \"bridge-name\":\"$new_brdige\", \"interface-name\":\"$new_iface\", \"node\":\"$switch_id\", \"port-name\":\"$switch_port\"}}" \
+    || crash
 
 echo
 
@@ -139,10 +141,14 @@ time_unattached=$(( ( $(date +%s%N) - $start_time ) / 1000000 ))
 
 log "new interface attached (black-out time: $time_unattached ms)"
 
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+log "removing interface $iface_name on $vn_name"
+
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     $ODL_API_URL/restconf/operations/vtn-vinterface:remove-vinterface \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
-    || exit 1
+    || crash
 
 log "interface removed successfully"
+
+log "Success!"
 

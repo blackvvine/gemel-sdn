@@ -68,23 +68,23 @@ log "VM ingress port is interface \"$switch_port\" @ $switch_gcp_name"
 bash $DIR/get_topology.sh
 
 # extract openflow ID of switch from topology API results
-ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")"
+ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")" || exit 1
 switch_id=$(echo "$ids" | tail -n 1)
 
 log "OpenFlow ID of the switch is $switch_id"
 
-bridge_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
+bridge_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
 
 log "Bridge on $vn_name is called: $bridge_name"
 
-interface_num=$(( $( curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .vinterface | .[] | .name" | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort -n | tail -n 1 ) + 1 ))
+interface_num=$(( $( curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .vinterface | .[] | .name" | sed -E 's/^[[:alnum:]]+i([[:digit:]]+)$/\1/g' | sort -n | tail -n 1 ) + 1 ))
 
 iface_name="${vn_name}i$interface_num"
 
 log "New interface will be called $iface_name"
 
 # create new interface
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     $ODL_API_URL/restconf/operations/vtn-vinterface:update-vinterface \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
     || exit 1
@@ -94,7 +94,7 @@ echo
 log "iface $iface_name created."
 
 # trigger final API call
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     "$ODL_API_URL/restconf/operations/vtn-port-map:set-port-map" \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\", \"node\":\"$switch_id\", \"port-name\":\"$switch_port\"}}" \
     || exit 1

@@ -7,3 +7,8 @@ log() {
     echo "$(date) :: INFO :: $@"
     # echo "$(date --rfc-3339="seconds") :: INFO :: $@"
 }
+
+crash() {
+    echo Error
+    exit 1
+}

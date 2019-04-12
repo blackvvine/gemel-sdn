@@ -65,39 +65,45 @@ log "VM ingress port is interface \"$switch_port\" @ $switch_gcp_name"
 bash $DIR/get_topology.sh
 
 # extract openflow ID of switch from topology API results
-ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")"
+ids="$(python "$DIR/get_id.py" "$DIR/out.xml" "$host_mac")" || exit 1
 switch_id=$(echo "$ids" | tail -n 1)
 
 log "OpenFlow ID of the switch is $switch_id"
 
-bridge_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
+bridge_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name")
 
 log "Bridge on $vn_name is called: $bridge_name"
 
 # find interface
-iface_name=$(curl --user "$ODL_API_USER":"$ODL_API_PASS" -X GET \
+iface_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET \
     $ODL_API_URL/restconf/operational/vtn:vtns/ | \
     jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .vinterface | .[] | select(.[\"port-map-config\"].node==\"$switch_id\" and .[\"port-map-config\"][\"port-name\"]==\"$switch_port\") | .name")
 
 log "interface to be unmapped is: $iface_name"
 
-echo 
+echo
+
+log "removing port-mapping"
 
 # trigger final API call
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     "$ODL_API_URL/restconf/operations/vtn-port-map:remove-port-map" \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
-    || exit 1
+    || crash
 
 echo
 
 log "interface unmapped successfully"
 
+log "removing interface..."
 
-curl --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
+curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     $ODL_API_URL/restconf/operations/vtn-vinterface:remove-vinterface \
     -d "{\"input\":{\"tenant-name\":\"$vn_name\", \"bridge-name\":\"$bridge_name\", \"interface-name\":\"$iface_name\"}}" \
-    || exit 1
+    || crash
 
 log "interface removed successfully"
+
+log "Success!"
+
 
