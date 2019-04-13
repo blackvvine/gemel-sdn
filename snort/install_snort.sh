@@ -19,7 +19,7 @@ SCP() {
 }
 
 # print help and exit if not enough args given
-[ $# -ge 3 ] || {
+[ $# -ge 1 ] || {
     print_help
     exit 1
 }
