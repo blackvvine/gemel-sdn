@@ -46,3 +46,5 @@ SSH $NAME 'cd ~/barnyard2/barnyard2-master && make && sudo make install && /usr/
 
 log "Copying and creating some files that Barnyard2 requires to run"
 SSH $NAME 'sudo cp ~/barnyard2/barnyard2-master/etc/barnyard2.conf /etc/snort/ && sudo mkdir /var/log/barnyard2 && sudo chown snort.snort /var/log/barnyard2 && sudo touch /var/log/snort/barnyard2.waldo && sudo chown snort.snort /var/log/snort/barnyard2.waldo'
+
+log "success!"
