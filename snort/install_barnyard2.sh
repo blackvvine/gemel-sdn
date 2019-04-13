@@ -29,20 +29,20 @@ NAME="$1"
 
 log "Starting to install Barnyard2 on VM $NAME"
 
-log "Installing the Barnyard2 pre-requisites: mysql-server libmysqlclient-dev mysql-client autoconf libtool"
-SSH $NAME 'sudo apt-get install -y mysql-server libmysqlclient-dev mysql-client autoconf libtool'
+# log "Installing the Barnyard2 pre-requisites: mysql-server libmysqlclient-dev mysql-client autoconf libtool"
+# SSH $NAME 'sudo apt-get install -y mysql-server libmysqlclient-dev mysql-client autoconf libtool'
 
 log "Downloading Barnyard2"
-SSH $NAME 'cd ~/snort_src && wget https://github.com/firnsy/barnyard2/archive/master.tar.gz -O barnyard2-Master.tar.gz'
+SSH $NAME 'mkdir ~/barnyard2 && cd ~/barnyard2 && wget https://github.com/firnsy/barnyard2/archive/master.tar.gz -O barnyard2-Master.tar.gz'
 
 log "Preparing for installation"
-SSH $NAME 'cd ~/snort_src && tar zxvf barnyard2-Master.tar.gz && cd barnyard2-master && autoreconf -fvi -I ./m4 && sudo ln -s /usr/include/dumbnet.h /usr/include/dnet.h && sudo ldconfig'
+SSH $NAME 'cd ~/barnyard2 && tar zxvf barnyard2-Master.tar.gz && cd barnyard2-master && autoreconf -fvi -I ./m4 && sudo ln -s /usr/include/dumbnet.h /usr/include/dnet.h && sudo ldconfig'
 
 log "Pointing the install to the correct MySQL libraray"
-SSH $NAME 'cd ~/snort_src/barnyard2-master && ./configure --with-mysql --with-mysql-libraries=/usr/lib/x86_64-linux-gnu'
+SSH $NAME 'cd ~/barnyard2/barnyard2-master && ./configure --with-mysql --with-mysql-libraries=/usr/lib/x86_64-linux-gnu'
 
 log "Building and installing Barnyard2"
-SSH $NAME 'cd ~/snort_src/barnyard2-master && make && sudo make install && /usr/local/bin/barnyard2 -V'
+SSH $NAME 'cd ~/barnyard2/barnyard2-master && make && sudo make install && /usr/local/bin/barnyard2 -V'
 
 log "Copying and creating some files that Barnyard2 requires to run"
-SSH $NAME 'sudo cp ~/snort_src/barnyard2-master/etc/barnyard2.conf /etc/snort/ && sudo mkdir /var/log/barnyard2 && sudo chown snort.snort /var/log/barnyard2 && sudo touch /var/log/snort/barnyard2.waldo && sudo chown snort.snort /var/log/snort/barnyard2.waldo'
+SSH $NAME 'sudo cp ~/barnyard2/barnyard2-master/etc/barnyard2.conf /etc/snort/ && sudo mkdir /var/log/barnyard2 && sudo chown snort.snort /var/log/barnyard2 && sudo touch /var/log/snort/barnyard2.waldo && sudo chown snort.snort /var/log/snort/barnyard2.waldo'
