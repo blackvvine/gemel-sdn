@@ -18,6 +18,12 @@ SCP() {
     gcloud compute scp --recurse $1 $2
 }
 
+# print help and exit if not enough args given
+[ $# -ge 3 ] || {
+    print_help
+    exit 1
+}
+
 # parse args
 NAME="$1"
 
