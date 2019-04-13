@@ -54,3 +54,5 @@ SSH $NAME 'cd ~/snort_src && wget http://luajit.org/download/LuaJIT-2.0.5.tar.gz
 # install Snort
 log "Installing Snort-2.9.13"
 SSH $NAME 'cd ~/snort_src && wget https://www.snort.org/downloads/snort/snort-2.9.13.tar.gz && tar xvzf snort-2.9.13.tar.gz && cd snort-2.9.13 && ./configure --enable-sourcefire && make && sudo make install && sudo ldconfig && sudo ln -s /usr/local/bin/snort /usr/sbin/snort && snort -V'
+
+log "success!"
