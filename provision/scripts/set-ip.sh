@@ -7,6 +7,6 @@ then
 	exit 1
 fi
 
-ifconfig br0-int $1 mtu 1450 up
+ifconfig br0-int $1 mtu 1400 up
 
 
