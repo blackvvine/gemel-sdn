@@ -9,16 +9,17 @@ VNet
 ----
 Convenient scripts for adding/removing hosts to/from virtual networks.
 
-
 Set-up
 ------
 Notes and scripting for setting up the SDN from scratch on GCP.
-
 
 Provision
 ---------
 Scripts used for instantiating new virtual machines and setting up OVS and connections on them
 
+Snort
+---------
+Scripts used for installing Snort and Barnyard2 and setting up a MySQL database used by Snort
 
 Getting Started
 ---------------
