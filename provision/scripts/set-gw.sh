@@ -18,7 +18,7 @@ pubkey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLMdueHvybfuxc9/DRGkTGLUpA+lkIJ6a7
 
 echo $pubkey >> ~/.ssh/authorized_keys
 
-sudo ip route add 10.142.0.0/24 via 10.142.0.1 # (google's internal ip range)
+sudo ip route add 10.142.0.0/16 via 10.142.0.1 # (google's internal ip range)
 sudo route add default gw $gw_overlay_ip # (overlay ip of the gateway host which is used by br0-int)
 sudo route del default gw 10.142.0.1 # delete google default GW
 
