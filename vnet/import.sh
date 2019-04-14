@@ -1,5 +1,5 @@
 
-ODL_API_URL="http://35.229.97.107:8080"
+ODL_API_URL="http://35.196.130.113:8080"
 ODL_API_USER=admin
 ODL_API_PASS=admin
 
