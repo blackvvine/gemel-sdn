@@ -91,6 +91,8 @@ new_iface="${new_vn}i$interface_num"
 
 log "New interface will be called $new_iface"
 
+set -x
+
 # create new interface
 curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \
     $ODL_API_URL/restconf/operations/vtn-vinterface:update-vinterface \

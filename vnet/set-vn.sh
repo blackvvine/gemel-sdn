@@ -73,6 +73,8 @@ switch_id=$(echo "$ids" | tail -n 1)
 
 log "OpenFlow ID of the switch is $switch_id"
 
+set -x
+
 bridge_name=$(curl --silent --user "$ODL_API_USER":"$ODL_API_PASS" -X GET $ODL_API_URL/restconf/operational/vtn:vtns/ | jq -r ".vtns | .[] | .[] | select(.name==\"$vn_name\") | .vbridge | .[0] | .name") || crash
 
 log "Bridge on $vn_name is called: $bridge_name"

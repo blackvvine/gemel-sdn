@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from bs4 import BeautifulSoup as BS
 from sys import argv
@@ -6,7 +6,7 @@ import re
 
 
 def print_help():
-    print("Usage: ./get-ip.sh [topology XML file] [MAC address]")
+    print("Usage: ./get_id.sh [topology XML file] [MAC address]")
     exit(0)
 
 if len(argv) < 3:

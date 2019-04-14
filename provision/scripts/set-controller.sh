@@ -6,7 +6,7 @@ then
     exit 1
 fi
 
-ovs-vsctl set bridge br0 protocols=OpenFlow10 -- set-controller br0 tcp:$ip:6653
+ovs-vsctl set bridge br0 protocols=OpenFlow10 -- set-controller br0 tcp:$ip:6633
 
 
 

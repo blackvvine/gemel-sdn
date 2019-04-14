@@ -26,6 +26,8 @@
       - "linux-headers-{{ linux_version.stdout }}"
       - iperf
       - screen
+      - python-pip
+      - htop
   - file:
       path: /root/ovs
       state: directory
