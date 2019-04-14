@@ -29,8 +29,8 @@ NAME="$1"
 
 log "Starting to install Barnyard2 on VM $NAME"
 
-# log "Installing the Barnyard2 pre-requisites: mysql-server libmysqlclient-dev mysql-client autoconf libtool"
-# SSH $NAME 'sudo apt-get install -y mysql-server libmysqlclient-dev mysql-client autoconf libtool'
+log "Installing the Barnyard2 pre-requisites: mysql-server libmysqlclient-dev mysql-client autoconf libtool"
+SSH $NAME 'sudo apt-get install -y mysql-server libmysqlclient-dev mysql-client autoconf libtool'
 
 log "Downloading Barnyard2"
 SSH $NAME 'mkdir ~/barnyard2 && cd ~/barnyard2 && wget https://github.com/firnsy/barnyard2/archive/master.tar.gz -O barnyard2-Master.tar.gz'
