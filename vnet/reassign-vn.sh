@@ -37,18 +37,18 @@ fi
 
 # echo "Removing host $gcp_name from VN $vn_name"
 
-host_mac=$(gcloud compute ssh $gcp_name -- bash -c 'ifconfig | grep br0 | grep -oE "(.{2}:){5}.{2}"')
+host_mac=$($GSSH $gcp_name -- bash -c 'ifconfig | grep br0 | grep -oE "(.{2}:){5}.{2}"')
 
 host_mac=$(echo -n $host_mac | sed 's/\\r//g')
 host_mac="${host_mac/$'\r'/}"
 
 log "VM MAC address is $host_mac"
 
-switch_ip=$(gcloud compute ssh $gcp_name -- sudo ovs-vsctl show | grep -oE 'remote_ip=".+"' | grep -oE '([0-9]+\.){3}[0-9]+')
+switch_ip=$($GSSH $gcp_name -- sudo ovs-vsctl show | grep -oE 'remote_ip=".+"' | grep -oE '([0-9]+\.){3}[0-9]+')
 
 log "switch IP is \"$switch_ip\""
 
-vxlan_key=$(gcloud compute ssh $gcp_name -- sudo ovs-vsctl show | grep -oE 'key="[0-9]+"' | grep -oE '[0-9]+')
+vxlan_key=$($GSSH $gcp_name -- sudo ovs-vsctl show | grep -oE 'key="[0-9]+"' | grep -oE '[0-9]+')
 
 log "VXLAN key is $vxlan_key"
 
@@ -57,7 +57,7 @@ switch_gcp_name=$(gcloud compute instances list | grep $switch_ip | awk '{print 
 log "switch VM name is \"$switch_gcp_name\""
 
 # find associated port on switch
-switch_port=$(gcloud compute ssh $switch_gcp_name -- sudo ovs-vsctl show | grep -B 1000 "key=\"$vxlan_key\"" | grep -oE 'Port ".+"' | tail -n 1 | grep -oE '".+"' | cut -d"\"" -f2)
+switch_port=$($GSSH $switch_gcp_name -- sudo ovs-vsctl show | grep -B 1000 "key=\"$vxlan_key\"" | grep -oE 'Port ".+"' | tail -n 1 | grep -oE '".+"' | cut -d"\"" -f2)
 
 log "VM ingress port is interface \"$switch_port\" @ $switch_gcp_name"
 

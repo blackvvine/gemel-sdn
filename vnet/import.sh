@@ -12,3 +12,5 @@ crash() {
     echo Error
     exit 1
 }
+
+GSSH="gcloud compute ssh --zone=us-east1-b "
