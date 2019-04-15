@@ -117,7 +117,7 @@ ovs-ofctl add-flow br0 in_port=$vx1,priority=800,actions:output=$int
 
 ===================================================
 
-snort -A console -Q -c /etc/snort/snort.conf -i ingress:egress -N
+snort -A console -q -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
 
 ===================================================
 
