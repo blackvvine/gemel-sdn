@@ -86,7 +86,7 @@ sudo sed -i "s/#include \$RULE_PATH\/local.rules/include \$RULE_PATH\/local.rule
 
 sudo sed -i "s/_LIST_PATH \/etc\/snort\/rules/_LIST_PATH \/etc\/snort\/rules\/iplists/" /etc/snort/snort.conf
 
- sudo snort -T -i eth0 -c /etc/snort/snort.conf
+sudo snort -T -i ens4 -c /etc/snort/snort.conf
 
 echo "config daq: afpacket" >> /etc/snort/snort.conf
 echo "config daq_mode: inline" >> /etc/snort/snort.conf
@@ -104,20 +104,37 @@ ifconfig egress up
 [ RUN enable-gw.sh AND set-gw.sh ON HOST AND ROUTER RESPECTIVELY]
 
 ===================================================
+# port number of the internal interface
+# int=
 
-ovs-ofctl add-flow br0 in_port=$egress,priority=10,actions=output:$int
+# MAC address of the internal interface
+# int_mac=
 
-ovs-ofctl add-flow br0 in_port=$vx1,dl_dst=01:00:00:00:00:00/01:00:00:00:00:00,priority=4000,actions=output:$int
+# port number of vx1
+# vx1=
 
-ovs-ofctl add-flow br0 in_port=$vx1,dl_dst=de:40:e4:7b:34:4a,dl_type=0x0800,nw_dst=210.0.0.32,priority=1000,actions:output=$int
+# port number of ingress
+# ingress=
 
-ovs-ofctl add-flow br0 in_port=$vx1,dl_type=0x0800,priority=900,actions:output=$ingress
+# port number of egress
+# egress=
 
-ovs-ofctl add-flow br0 in_port=$vx1,priority=800,actions:output=$int
+# overlay ip address of the gateway
+# gw_overlay=
+
+# ovs-ofctl add-flow br0 in_port=$egress,priority=10,actions=output:$int
+
+# ovs-ofctl add-flow br0 in_port=$vx1,dl_dst=01:00:00:00:00:00/01:00:00:00:00:00,priority=4000,actions=output:$int
+
+# ovs-ofctl add-flow br0 in_port=$vx1,dl_dst=$int_mac,dl_type=0x0800,nw_dst=$gw_overlay,priority=1000,actions:output=$int
+
+# ovs-ofctl add-flow br0 in_port=$vx1,dl_type=0x0800,priority=900,actions:output=$ingress
+
+# ovs-ofctl add-flow br0 in_port=$vx1,priority=800,actions:output=$int
 
 ===================================================
 
-snort -A console -q -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
+# snort -A console -q -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
 
 ===================================================
 
