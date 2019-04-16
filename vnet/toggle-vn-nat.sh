@@ -27,7 +27,7 @@ fi
 
 if [[ "$current_vn" == "vnet1" ]]
 then
-    gateway="bella-h5"
+    gateway="bella-h4"
 elif [[ "$current_vn" == "vnet2" ]]
 then
     gateway="bella-h1"
