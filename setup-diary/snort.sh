@@ -1,6 +1,8 @@
 
 sudo apt-get install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev libnghttp2-dev
 
+threads=$(cat /proc/cpuinfo | grep -E '^processor' | wc -l)
+
 mkdir -p ~/snort_src
 
 cd ~/snort_src
@@ -8,7 +10,7 @@ wget https://snort.org/downloads/snort/daq-2.0.6.tar.gz
 tar -xvzf daq-2.0.6.tar.gz
 cd daq-2.0.6
 ./configure
-make
+make -j $threads
 sudo make install
 
 cd ~/snort_src
@@ -20,7 +22,7 @@ autoreconf -i --force
 automake
 autoconf
 ./configure --enable-lib-only
-make
+make -j $threads
 sudo make install
 
 
@@ -29,7 +31,7 @@ wget https://www.snort.org/downloads/archive/snort/snort-2.9.9.0.tar.gz
 tar -xvzf snort-2.9.9.0.tar.gz
 cd snort-2.9.9.0
 ./configure --enable-sourcefire
-make
+make -j $threads
 sudo make install
 
 sudo ldconfig
@@ -86,7 +88,7 @@ sudo sed -i "s/#include \$RULE_PATH\/local.rules/include \$RULE_PATH\/local.rule
 
 sudo sed -i "s/_LIST_PATH \/etc\/snort\/rules/_LIST_PATH \/etc\/snort\/rules\/iplists/" /etc/snort/snort.conf
 
- sudo snort -T -i eth0 -c /etc/snort/snort.conf
+ sudo snort -T -i ens4 -c /etc/snort/snort.conf
 
 echo "config daq: afpacket" >> /etc/snort/snort.conf
 echo "config daq_mode: inline" >> /etc/snort/snort.conf
