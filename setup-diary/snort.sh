@@ -1,3 +1,4 @@
+set -e
 
 sudo apt-get install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev libnghttp2-dev
 
@@ -101,11 +102,11 @@ ifconfig egress up
 
 
 
-===================================================
+# ===================================================
 
-[ RUN enable-gw.sh AND set-gw.sh ON HOST AND ROUTER RESPECTIVELY]
+# [ RUN enable-gw.sh AND set-gw.sh ON HOST AND ROUTER RESPECTIVELY]
 
-===================================================
+# ===================================================
 # port number of the internal interface
 # int=
 

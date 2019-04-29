@@ -35,7 +35,8 @@ then
     exit 1
 fi
 
-# echo "Removing host $gcp_name from VN $vn_name"
+log "Pinging to let controller know we exist"
+host_mac=$($GSSH $gcp_name -- ping -c5 210.0.0.1)
 
 host_mac=$($GSSH $gcp_name -- bash -c 'ifconfig | grep br0 | grep -oE "(.{2}:){5}.{2}"')
 
@@ -91,7 +92,7 @@ new_iface="${new_vn}i$interface_num"
 
 log "New interface will be called $new_iface"
 
-set -x
+# set -x
 
 # create new interface
 curl --silent --fail --user "$ODL_API_USER":"$ODL_API_PASS" -H "Content-type: application/json" -X POST \

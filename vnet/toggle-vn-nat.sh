@@ -27,10 +27,10 @@ fi
 
 if [[ "$current_vn" == "vnet1" ]]
 then
-    gateway="bella-h4"
+    gateway="rl-gw"
 elif [[ "$current_vn" == "vnet2" ]]
 then
-    gateway="bella-h1"
+    gateway="rl-gw2"
 else
     echo "Unknown vn $current_vn"
     exit 1
