@@ -3,3 +3,5 @@
 __pycache__
 vnet/out.xml
 .DS_Store
+/env
+
