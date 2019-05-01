@@ -244,7 +244,26 @@
       - ingress
       - egress
 
-      
+  - name: verify snort dirs
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: snort
+      group: snort
+      mode: 5775
+    with_items:
+      - /etc/snort
+      - /etc/snort/rules
+      - /etc/snort/rules/iplists
+      - /etc/snort/preproc_rules
+      - /usr/local/lib/snort_dynamicrules
+      - /etc/snort/so_rules
+      - /var/log/snort
+      - /var/log/snort/archived_logs
+
+  - name: enable gateway
+    shell: /root/scripts/set-gw.sh
+
   
   
 
