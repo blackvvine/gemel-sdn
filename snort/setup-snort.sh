@@ -42,20 +42,20 @@ NAME="$1"
 log "Updating scripts in VM $NAME"
 SCP $DIR/scripts $NAME:~ || exit 1
 
-# install ansible
-log "Install latest Ansible"
-SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible -y'
-SSH $NAME 'sudo apt update'
-SSH $NAME 'sudo apt install -y ansible'
-
-# install OVS
+## install ansible
+#log "Install latest Ansible"
+#SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible -y'
+#SSH $NAME 'sudo apt update'
+#SSH $NAME 'sudo apt install -y ansible'
+#
+## install Snort
 SSH $NAME 'sudo ansible-playbook scripts/snort.yml'
 
-log "Enable gateway"
-SSH $NAME 'sudo ~/scripts/enable-gw.sh'
+#log "Enable gateway"
+#SSH $NAME 'sudo ~/scripts/enable-gw.sh'
 
-log "Set-up Snort circuit"
-SSH $NAME 'sudo ~/scripts/setup-circuit.sh'
+#log "Set-up Snort circuit"
+#SSH $NAME 'sudo ~/scripts/setup-circuit.sh'
 
 log "Success!"
 

@@ -141,7 +141,7 @@
       state: directory
       owner: snort
       group: snort
-      mode: 5775
+      mode: 775
     with_items:
       - /etc/snort
       - /etc/snort/rules
@@ -159,7 +159,7 @@
       dest: "{{ item }}"
       group: snort
       owner: snort
-      mode: 5775
+      mode: 775
     with_items:
       - /etc/snort/rules/iplists/black_list.rules
       - /etc/snort/rules/iplists/white_list.rules
@@ -250,7 +250,7 @@
       state: directory
       owner: snort
       group: snort
-      mode: 5775
+      mode: 775
     with_items:
       - /etc/snort
       - /etc/snort/rules
@@ -264,8 +264,104 @@
   - name: enable gateway
     shell: /root/scripts/set-gw.sh
 
-  
-  
+  - name: Install Barnyard dependecies
+    apt:
+      name: "{{ item }}"
+      update_cache: true
+      state: present
+    with_items:
+      - mysql-server
+      - libmysqlclient-dev
+      - mysql-client
+      - autoconf
+      - libtool
+
+  - name: Add output line to snort.conf
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: 'output unified2: filename snort.u2, limit 128'
+      insertafter: '^# output unified2: filename merged.log'
+      line: 'output unified2: filename snort.u2, limit 128'
+
+  # install barnyard
+  - name: download Barnyard source
+    get_url:
+      url: https://github.com/firnsy/barnyard2/archive/master.tar.gz
+      dest: /root/snort_src/barnyard2-Master.tar.gz
+
+  - name: unarchive Barnyard
+    unarchive:
+      src: /root/snort_src/barnyard2-Master.tar.gz
+      dest: /root/snort_src/
+
+  - name: configure Barnyard (1/2)
+    shell: autoreconf -fvi -I ./m4
+    args:
+      chdir: /root/snort_src/barnyard2-master
+
+  - name: link dnet
+    file:
+      src: /usr/include/dumbnet.h
+      dest: /usr/include/dnet.h
+      state: link
+
+  - name: ldconfig
+    shell: ldconfig
+
+  - name: configure Barnyard (2/2)
+    shell: ./configure --with-mysql --with-mysql-libraries=/usr/lib/x86_64-linux-gnu
+    args:
+      chdir: /root/snort_src/barnyard2-master
+
+  - name: make Barnyard
+    make:
+      chdir: /root/snort_src/barnyard2-master
+      params:
+        NUM_THREADS: "{{ threads.stdout }}"
+
+  - name: install Barnyard
+    make:
+      chdir: /root/snort_src/barnyard2-master
+      target: install
+
+  - name: verify barnyard installation
+    shell: /usr/local/bin/barnyard2 -V
+
+  - name: create waldo file for barnyard
+    copy:
+      force: no
+      content: ""
+      dest: /var/log/snort/barnyard2.waldo
+      group: snort
+      owner: snort
+      mode: 775
+
+  - name: copy barnyard conf to snort
+    copy:
+      src: /root/snort_src/barnyard2-master/etc/barnyard2.conf
+      dest: /etc/snort
+      owner: snort
+      group: snort
+      mode: 775
+
+  - name: create barnyard log directory
+    file:
+      path: /var/log/barnyard2
+      state: directory
+      owner: snort
+      group: snort
+
+  - name: DB config for barnyard
+    lineinfile:
+      path: /etc/snort/barnyard2.conf
+      line: 'output database: log, mysql, user=snort password=snort dbname=snort host=localhost sensor name=sensor01'
+      create: yes
+
+  - name: restrict barnyard config access
+    shell: chmod o-r /etc/snort/barnyard2.conf
+
+  - name: init barnyard database
+    shell: /root/scripts/queries.sh
 
 
 
