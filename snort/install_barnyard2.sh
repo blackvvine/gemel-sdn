@@ -1,5 +1,7 @@
 #/!bin/bash
 
+set -e
+
 print_help() {
     echo -e "Install Barnyard2 on the VM"
     echo "./install_barnyard2.sh [VM NAME]"

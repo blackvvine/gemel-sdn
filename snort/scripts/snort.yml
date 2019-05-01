@@ -1,0 +1,252 @@
+---
+
+- hosts: localhost
+  user: root
+  name: Install Open vSwitch
+  tasks:
+  - name: update apt
+    apt: upgrade=dist
+  - shell: "cat /proc/cpuinfo | grep -E '^processor' | wc -l"
+    register: threads
+  - debug:
+      var: threads.stdout
+  - name: install dependencies
+    apt:
+      name: "{{ item }}"
+      update_cache: true
+      state: present
+    with_items:
+      - git
+      - build-essential
+      - libcap-dev
+      - libpcap-dev
+      - python-pip
+      - libpcre3-dev
+      - libdumbnet-dev
+      - bison
+      - flex
+      - zlib1g-dev
+      - liblzma-dev
+      - openssl
+      - libssl-dev
+      - libnghttp2-dev
+  - name: create source directory
+    file:
+      path: /root/snort_src
+      state: directory
+  # install DAQ
+  - name: download DAQ source
+    get_url:
+      url: https://snort.org/downloads/snort/daq-2.0.6.tar.gz
+      dest: /root/snort_src
+  - name: unarchive DAQ
+    unarchive:
+      src: /root/snort_src/daq-2.0.6.tar.gz
+      dest: /root/snort_src/
+  - name: configure DAQ
+    shell: ./configure
+    args:
+      chdir: /root/snort_src/daq-2.0.6
+  - name: make DAQ
+    make:
+      chdir: /root/snort_src/daq-2.0.6
+      params:
+        NUM_THREADS: "{{ threads.stdout }}"
+  - name: install DAQ
+    make:
+      chdir: /root/snort_src/daq-2.0.6
+      target: install
+  # install NGHTTP2
+  - name: download NGH2 source
+    get_url:
+      url: https://github.com/nghttp2/nghttp2/releases/download/v1.17.0/nghttp2-1.17.0.tar.gz
+      dest: /root/snort_src
+  - name: unarchive NGH2
+    unarchive:
+      src: /root/snort_src/nghttp2-1.17.0.tar.gz
+      dest: /root/snort_src/
+  - name: configure NGH2 (1/4)
+    shell: autoreconf -i --force
+    args:
+      chdir: /root/snort_src/nghttp2-1.17.0
+  - name: configure NGH2 (2/4)
+    shell: automake
+    args:
+      chdir: /root/snort_src/nghttp2-1.17.0
+  - name: configure NGH2 (3/4)
+    shell: autoconf
+    args:
+      chdir: /root/snort_src/nghttp2-1.17.0
+  - name: configure NGH2 (4/4)
+    shell: ./configure
+    args:
+      chdir: /root/snort_src/nghttp2-1.17.0
+  - name: make NGH2
+    make:
+      chdir: /root/snort_src/nghttp2-1.17.0
+      params:
+        NUM_THREADS: "{{ threads.stdout }}"
+  - name: install NGH2
+    make:
+      chdir: /root/snort_src/nghttp2-1.17.0
+      target: install
+  # Make Snort
+  - name: download Snort source
+    get_url:
+      url: https://www.snort.org/downloads/archive/snort/snort-2.9.9.0.tar.gz
+      dest: /root/snort_src
+  - name: unarchive Snort
+    unarchive:
+      src: /root/snort_src/snort-2.9.9.0.tar.gz
+      dest: /root/snort_src/
+  - name: configure Snort
+    shell: ./configure --enable-sourcefire
+    args:
+      chdir: /root/snort_src/snort-2.9.9.0
+  - name: make Snort
+    make:
+      chdir: /root/snort_src/snort-2.9.9.0
+      params:
+        NUM_THREADS: "{{ threads.stdout }}"
+  - name: install Snort
+    make:
+      chdir: /root/snort_src/snort-2.9.9.0
+      target: install
+  # =============================================== #
+
+  - name: ldconfig
+    shell: ldconfig
+
+  - name: link snort
+    file:
+      src: /usr/local/bin/snort
+      dest: /usr/sbin/snort
+      state: link
+
+  - name: make group snort
+    group:
+      name: snort
+      state: present
+
+  - name: make user snort
+    user:
+      name: snort
+      comment: Snort IDS
+      group: snort
+      shell: /sbin/nologin
+
+  - name: make snort dirs
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: snort
+      group: snort
+      mode: 5775
+    with_items:
+      - /etc/snort
+      - /etc/snort/rules
+      - /etc/snort/rules/iplists
+      - /etc/snort/preproc_rules
+      - /usr/local/lib/snort_dynamicrules
+      - /etc/snort/so_rules
+      - /var/log/snort
+      - /var/log/snort/archived_logs
+
+  - name: create snort files
+    copy:
+      force: no
+      content: ""
+      dest: "{{ item }}"
+      group: snort
+      owner: snort
+      mode: 5775
+    with_items:
+      - /etc/snort/rules/iplists/black_list.rules
+      - /etc/snort/rules/iplists/white_list.rules
+      - /etc/snort/rules/local.rules
+      - /etc/snort/sid-msg.map
+
+  - name: copy configs to snort dir (1/2)
+    copy:
+      src: "{{ item }}"
+      dest: /etc/snort
+    with_fileglob:
+      - /root/snort_src/snort-2.9.9.0/etc/*conf*
+      - /root/snort_src/snort-2.9.9.0/etc/*.map
+      - /root/snort_src/snort-2.9.9.0/etc/*.dtd
+
+  - name: copy configs to snort dir (2/2)
+    copy:
+      src: "{{ item }}"
+      dest: /usr/local/lib/snort_dynamicpreprocessor/
+    with_fileglob:
+      - /root/snort_src/snort-2.9.9.0/src/dynamic-preprocessors/build/usr/local/lib/snort_dynamicpreprocessor/*
+
+  - name: Snort config (1/6)
+    replace:
+      path: /etc/snort/snort.conf
+      regexp: '^(include \$RULE_PATH.*)'
+      replace: '#\1'
+
+  - name: Snort config (2/6)
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: 'ipvar HOME_NET any'
+      line: 'ipvar HOME_NET 210.0.0.0/24'
+
+  - name: Snort config (3/6)
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: "var {{ item.a }} ../.*"
+      line: 'var {{ item.a }} {{ item.b }}'
+    with_items:
+      - a: RULE_PATH
+        b: /etc/snort/rules
+      - a: SO_RULE_PATH
+        b: /etc/snort/so_rules
+      - a: PREPROC_RULE
+        b: /etc/snort/preproc_rules
+      - a: WHITE_LIST_PATH
+        b: /etc/snort/rules/iplists
+      - a: BLACK_LIST_PATH
+        b: /etc/snort/rules/iplists
+
+  - name: Snort config (4/6)
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: "#(include \\$RULE_PATH/local.rules)"
+      line: '\1'
+      backrefs: yes
+
+  - name: Ensure snort config working
+    shell: "snort -T -i ens4 -c /etc/snort/snort.conf"
+
+  - name: Snort config (5/6)
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: '\\s*#\\s*config daq:.*'
+      line: 'config daq: afpacket'
+
+  - name: Snort config (6/6)
+    lineinfile:
+      path: /etc/snort/snort.conf
+      regexp: '\\s*#\\s*config daq_mode:.*'
+      line: 'config daq_mode: inline'
+  - name: Make ingress and engress
+    shell: "ovs-vsctl add-port br0 {{ item }} -- set interface {{ item }} type=internal"
+    with_items:
+      - ingress
+      - egress
+
+  - name: Turn ingress and engress on
+    shell: "ifconfig {{ item }} up"
+    with_items:
+      - ingress
+      - egress
+
+      
+  
+  
+
+
+

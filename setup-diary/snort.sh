@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 
 sudo apt-get install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev libnghttp2-dev
