@@ -39,16 +39,23 @@ SCP() {
 NAME="$1"
 
 # copy ansible playbook to host
-log "updating scripts in VM $NAME"
+log "Updating scripts in VM $NAME"
 SCP $DIR/scripts $NAME:~ || exit 1
 
-## install ansible
-#SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible -y'
-#SSH $NAME 'sudo apt update'
-#SSH $NAME 'sudo apt install -y ansible'
+# install ansible
+log "Install latest Ansible"
+SSH $NAME 'sudo apt-add-repository ppa:ansible/ansible -y'
+SSH $NAME 'sudo apt update'
+SSH $NAME 'sudo apt install -y ansible'
 
 # install OVS
 SSH $NAME 'sudo ansible-playbook scripts/snort.yml'
+
+log "Enable gateway"
+SSH $NAME 'sudo ~/scripts/enable-gw.sh'
+
+log "Set-up Snort circuit"
+SSH $NAME 'sudo ~/scripts/setup-circuit.sh'
 
 log "Success!"
 

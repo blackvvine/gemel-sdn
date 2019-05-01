@@ -233,7 +233,7 @@
       regexp: '\\s*#\\s*config daq_mode:.*'
       line: 'config daq_mode: inline'
   - name: Make ingress and engress
-    shell: "ovs-vsctl add-port br0 {{ item }} -- set interface {{ item }} type=internal"
+    shell: "ovs-vsctl --may-exist add-port br0 {{ item }} -- set interface {{ item }} type=internal"
     with_items:
       - ingress
       - egress
