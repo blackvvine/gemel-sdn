@@ -22,11 +22,11 @@ log() {
 }
 
 SSH() {
-    gcloud compute ssh $1 -- $2
+    gcloud compute ssh root@$1 -- $2
 }
 
 SCP() {
-    gcloud compute scp --recurse $1 $2
+    gcloud compute scp --recurse $1 root@$2
 }
 
 # print help and exit if not enough args given
