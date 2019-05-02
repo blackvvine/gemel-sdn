@@ -97,8 +97,8 @@
       dest: /etc/sdn
       state: link
 
-  - name: Start ODL
-    shell: /etc/sdn/bin/start
+  - name: start ODL
+    shell: screen -d -m bash -c '/etc/sdn/bin/karaf'
 
   # Fix m2 for VTN
   - name: make m2 dir
@@ -132,6 +132,11 @@ wget -q -O - https://raw.githubusercontent.com/opendaylight/odlparent/master/set
       chdir: /root/odl/vtn/coordinator
       params:
         NUM_THREADS: "{{ threads.stdout }}"
+
+  - name: install VTN
+    make:
+      chdir: /root/odl/vtn/coordinator
+      target: install
 
   - name: Setup VTN DB
     shell: /usr/local/vtn/sbin/db_setup
