@@ -4,10 +4,13 @@
   user: root
   name: Install Open vSwitch
   tasks:
-  - name: update apt 
+
+  - name: update apt
     apt: upgrade=dist
+
   - shell: uname -r
     register: linux_version
+
   - name: install dependencies
     apt:
       name: "{{ item }}"
@@ -28,51 +31,65 @@
       - screen
       - python-pip
       - htop
+
   - file:
       path: /root/ovs
       state: directory
+
   - name: download source
     get_url:
       url: https://www.openvswitch.org/releases/openvswitch-2.11.0.tar.gz
       dest: /root/ovs/
+
   - name: unarchive
     unarchive:
       src: /root/ovs/openvswitch-2.11.0.tar.gz
       dest: /root/ovs/
+
   - name: boot
     shell: ./boot.sh
     args:
       chdir: /root/ovs/openvswitch-2.11.0
+
   - name: configure ovs
     shell: "./configure --with-linux=/lib/modules/{{ linux_version.stdout }}/build"
     args:
       chdir: "/root/ovs/openvswitch-2.11.0"
+
   - name: make
     make:
       chdir: /root/ovs/openvswitch-2.11.0
+
   - name: make install
     make:
       chdir: /root/ovs/openvswitch-2.11.0
       target: install
+
   - name: make install mods
     make:
       chdir: /root/ovs/openvswitch-2.11.0
       target: modules_install
+
   - name: modprobe
     modprobe:
       name: openvswitch
+
   - file:
       path: /usr/local/etc/openvswitch
       state: directory
+
   - name: create DB
     shell: ovsdb-tool create /usr/local/etc/openvswitch/conf.db vswitchd/vswitch.ovsschema
     args:
       chdir: /root/ovs/openvswitch-2.11.0
+
   - file:
       path: /usr/local/var/run/openvswitch/
       state: directory
+
   - name: execute OVS DB
     shell: screen -d -m bash -c 'ovsdb-server -v --log-file --pidfile --remote=punix:/usr/local/var/run/openvswitch/db.sock'
+
   - name: execute OVS Daemon
     shell: screen -d -m bash -c 'ovs-vswitchd --pidfile'
 

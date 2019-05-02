@@ -112,6 +112,7 @@
     make:
       chdir: /root/snort_src/snort-2.9.9.0
       target: install
+
   # =============================================== #
 
   - name: ldconfig

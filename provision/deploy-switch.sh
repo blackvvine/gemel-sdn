@@ -1,12 +1,9 @@
 #!/bin/bash
 
-realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
-
 # get current file directory
 DIR="$(realpath $( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd ))"
 cd $DIR
+source $DIR/include.sh
 
 print_help() {
     echo -e "Creates a new VM, installs VXLAN capable OVS on it,\n connects it to one of the so-called \"physical\" switches on the SDN lab through VXLAN."
@@ -14,21 +11,8 @@ print_help() {
     exit 0
 }
 
-log() {
-    echo "$(date)" :: INFO :: $@""
-    # echo "$(date --rfc-3339="seconds") :: INFO :: $@"
-}
-
-SSH() {
-    gcloud compute ssh $1 -- $2
-}
-
-SCP() {
-    gcloud compute scp --recurse $1 $2
-}
-
 # print help and exit if not enough args given
-[ $# -ge 2 ] || {
+[[ $# -ge 2 ]] || {
     print_help
     exit 1
 }
@@ -36,10 +20,6 @@ SCP() {
 # parse args
 NAME="$1"
 CONTROLLER_IP="$2"
-
-# command aliases for easy unanimous updating
-# SSH="ssh -oStrictHostKeyChecking=no"
-# SCP="scp -oStrictHostKeyChecking=no"
 
 # create VM
 log "creating VM $NAME"
