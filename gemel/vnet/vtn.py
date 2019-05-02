@@ -183,6 +183,27 @@ def reassign_vtn(host_mac, new_vtn_name, safe=False):
     connect_to_vtn(host_mac, new_vtn_name)
 
 
+def toggle_vtn(host_mac, total=2):
+
+    current_vnet = _get_current_interface(host_mac)
+    if not current_vnet:
+        return False
+
+    current_vnet = current_vnet[0]
+
+    m = re.match(r"(\w+)(\d+)", current_vnet)
+    prefix, current_num = m.group(1), int(m.group(2))
+    new_num = current_num + 1 if current_num < total else 1
+    new_vtn_name = "%s%d" % (prefix, new_num)
+
+    logger.info("Will assign to %s", new_vtn_name)
+
+    remove_from_vtn(host_mac)
+    connect_to_vtn(host_mac, new_vtn_name)
+
+    return True
+
+
 if __name__ == "__main__":
     # reassign_vtn("1a:e1:a2:ca:cc:30", "vnet2")
     # print(get_new_iface_name("vnet1"))

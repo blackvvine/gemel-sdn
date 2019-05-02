@@ -1,4 +1,7 @@
 
+Make OVS:
+
+```
 apt-get update
 
 apt-get install -y git automake autoconf gcc uml-utilities libtool build-essential git pkg-config linux-headers-`uname -r`
@@ -20,7 +23,11 @@ make
 make install
 make modules_install
 
+```
 
+Run OVS:
+
+```
 modprobe openvswitch
 
 mkdir -p /usr/local/etc/openvswitch
@@ -39,23 +46,13 @@ ovs-vsctl --no-wait init
 
 ovs-vsctl show
 
-# ============================================================================ #
+```
 
+Make internal and VXLAN interfaces:
+
+```
 ovs-vsctl add-br br0
 ovs-vsctl add-port br0 br0-int -- set interface br0-int type=internal
 ovs-vsctl add-port br0 vx1 -- set interface vx1 type=vxlan options:remote_ip=$peer_ip options:key=2001
 ifconfig br0-int 210.0.0.101 mtu 1450 up
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
+```
