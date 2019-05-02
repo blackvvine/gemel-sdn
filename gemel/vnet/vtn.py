@@ -1,9 +1,7 @@
 import re
 
-from requests import HTTPError
-
-from utils.rest import vtn_api_post, odl_api_get, odl_api_post
-from utils.log import get_logger
+from gemel.utils.rest import vtn_api_post, odl_api_get
+from gemel.utils.log import get_logger
 
 
 logger = get_logger("vtn")

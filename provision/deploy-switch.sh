@@ -3,7 +3,7 @@
 # get current file directory
 DIR="$(realpath $( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd ))"
 cd $DIR
-source $DIR/include.sh
+source $DIR/../base/include.sh
 
 print_help() {
     echo -e "Creates a new VM, installs VXLAN capable OVS on it,\n connects it to one of the so-called \"physical\" switches on the SDN lab through VXLAN."

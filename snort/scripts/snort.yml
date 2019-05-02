@@ -2,7 +2,7 @@
 
 - hosts: localhost
   user: root
-  name: Install Open vSwitch
+  name: Install Snort and set-up gateway
   tasks:
   - name: update apt
     apt: upgrade=dist
@@ -263,7 +263,7 @@
       - /var/log/snort/archived_logs
 
   - name: enable gateway
-    shell: /root/scripts/set-gw.sh
+    shell: /root/scripts/enable-gw.sh
 
   - name: Install Barnyard dependecies
     apt:

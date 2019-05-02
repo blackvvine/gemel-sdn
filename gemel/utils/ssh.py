@@ -1,8 +1,3 @@
-from utils.shell import bash_run
-
-from os import environ
-
-
 # def export_keys_to(vm_name):
 #
 #     with open("{HOME}/.ssh/id_rsa.pub".format(**environ)) as f:

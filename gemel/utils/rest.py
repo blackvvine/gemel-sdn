@@ -1,7 +1,6 @@
 from json import JSONDecodeError
-import json
 
-from config import ODL_VTN_API_URL, ODL_MAIN_API_URL
+from gemel.config import ODL_VTN_API_URL, ODL_MAIN_API_URL
 from requests import get, post
 from requests.auth import HTTPBasicAuth
 
