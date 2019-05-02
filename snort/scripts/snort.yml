@@ -352,6 +352,20 @@
       owner: snort
       group: snort
 
+  - name: fix log dir permissions
+    file:
+      path: /var/log/snort
+      state: directory
+      owner: snort
+      group: snort
+      mode: 775
+
+  - name: add default ping rule
+    lineinfile:
+      path: /etc/snort/rules/local.rules
+      line: 'alert icmp any any -> any any (msg: "IP Packet detected"; sid: 10; rev: 1;)'
+      create: yes
+
   - name: DB config for barnyard
     lineinfile:
       path: /etc/snort/barnyard2.conf
@@ -364,5 +378,20 @@
   - name: init barnyard database
     shell: /root/scripts/queries.sh
 
+  - name: run Snort in screen
+    shell: screen -d -m bash -c 'snort -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort'
 
+  - name: run Barnyard in screen
+    shell: screen -d -m bash -c 'sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort'
+
+  - name: allow external MySQL access
+    replace:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: 127\.0\.0\.1
+      replace: 0.0.0.0
+
+  - name: restart MySQL
+    service:
+      name: mysql
+      state: restarted
 

@@ -36,6 +36,6 @@ x2Vh0fUwv9XCB+4H9JZ+Tp2lHaRf5OdAt4fhxjyvHj7cC6eGsAAACBAMynx3UjfRsa9WDy
 6zRF6OfT+flBwewdPwbwrEBLMrV4Rrk80YxVfhntzu5nDeVK5R1yxP/1Wmz62vUgXoTDR0
 PpoiocNWaCL6AVeY7Y7i3LH1D/Z46qlpJoEkzgGEUuRbtid3B39Z3v9/xZtSFoW25I8nAn
 O+h40NajWPP59jj7AAAAFGJsYWNrdnZpbmVAQmx1ZVNraWVzAQIDBAUG
------END OPENSSH PRIVATE KEY-----" >> ~/.ssh/gw
+-----END OPENSSH PRIVATE KEY-----" > ~/.ssh/gw
 
 chmod 600 ~/.ssh/gw
