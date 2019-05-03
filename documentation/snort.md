@@ -182,7 +182,7 @@ run ofctl command:
 Run snort in active mode:
 
 ```
-snort -A console -q -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
+snort -A console -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
 ```
 
 

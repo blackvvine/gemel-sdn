@@ -93,7 +93,7 @@ def _get_vtn_info(vtn_name):
     return vtn
 
 
-def _get_current_interface(host_mac):
+def get_current_interface(host_mac):
     """
     Returns the current virtual net, interface and bridge
     to which a given host is connected
@@ -118,7 +118,7 @@ def remove_from_vtn(host_mac):
     connected
     """
 
-    vtn, iface, vbr = _get_current_interface(host_mac)
+    vtn, iface, vbr = get_current_interface(host_mac)
     logger.info("Host currently connected to %s (iface %s on %s)", vtn, iface, vbr)
 
     vtn_api_post("/vtn-vinterface:remove-vinterface", data={
@@ -174,7 +174,7 @@ def connect_to_vtn(host_mac, vtn):
 
 def reassign_vtn(host_mac, new_vtn_name, safe=False):
     if safe:
-        if _get_current_interface(host_mac):
+        if get_current_interface(host_mac):
             remove_from_vtn(host_mac)
         else:
             logger.info("Host %s not assigned to any VTNs", host_mac)
@@ -185,7 +185,7 @@ def reassign_vtn(host_mac, new_vtn_name, safe=False):
 
 def toggle_vtn(host_mac, total=2):
 
-    current_vnet = _get_current_interface(host_mac)
+    current_vnet = get_current_interface(host_mac)
     if not current_vnet:
         return False
 
