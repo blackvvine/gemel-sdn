@@ -54,5 +54,31 @@ Make internal and VXLAN interfaces:
 ovs-vsctl add-br br0
 ovs-vsctl add-port br0 br0-int -- set interface br0-int type=internal
 ovs-vsctl add-port br0 vx1 -- set interface vx1 type=vxlan options:remote_ip=$peer_ip options:key=2001
-ifconfig br0-int 210.0.0.101 mtu 1450 up
+ifconfig br0-int 210.0.0.101 mtu 1400 up
 ```
+
+Restarting
+-----------
+
+In two tmux or screen windows, run:
+
+```
+ovsdb-server -v --log-file --pidfile --remote=punix:/usr/local/var/run/openvswitch/db.sock
+```
+
+For DB and the following for OVS daemon:
+
+```
+ovs-vswitchd --pidfile
+```
+
+Also ifconfig IP confs is lost with restart so:
+
+```
+ifconfig br0-int 210.0.0.101 mtu 1400 up
+```
+
+**Attention**
+If the internal IP address is changed, you will have to re-install OVS VXLANs. Use `gemel-sdn/provision/scripts/connect.sh` to do that.
+
+
