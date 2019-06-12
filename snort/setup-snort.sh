@@ -55,7 +55,7 @@ log "Enable gateway"
 SSH $NAME 'sudo ~/scripts/enable-gw.sh'
 
 log "Set-up Snort circuit"
-SSH $NAME 'sudo ~/scripts/setup-circuit.sh'
+SSH $NAME 'sudo ~/scripts/establish-circuit.sh'
 
 log "Success!"
 
