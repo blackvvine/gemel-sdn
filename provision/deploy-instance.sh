@@ -7,7 +7,7 @@ source $DIR/../base/include.sh
 
 print_help() {
     echo -e "Creates a new VM, installs VXLAN capable OVS on it,\n connects it to one of the so-called \"physical\" switches on the SDN lab through VXLAN."
-    echo "./add-instance.sh [VM NAME] [ENTRY SWITCH NAME] [OVERLAY IP]"
+    echo "./add-instance.sh [VM NAME] [ENTRY SWITCH NAME] [OVERLAY IP] [optional: VM TYPE]"
     exit 0
 }
 
@@ -21,6 +21,12 @@ print_help() {
 NAME="$1"
 SWITCH="$2"
 OVERLAY_IP="$3"
+VM_TYPE="$4"
+
+if [[ -z ${VM_TYPE+x} ]] 
+then
+    VM_TYPE="a"
+fi
 
 # command aliases for easy unanimous updating
 # SSH="ssh -oStrictHostKeyChecking=no"
@@ -33,8 +39,8 @@ then
 fi
 
 # create VM
-log "creating VM $NAME"
-$(realpath $DIR)/create-vm.sh $NAME || exit 1
+log "creating VM $NAME of type $VM_TYPE"
+$(realpath $DIR)/create-vm.sh $NAME $VM_TYPE || exit 1
 
 # get VM IP address
 VM_IP=$(gcloud compute instances list | grep $NAME | awk '{ print $5 }')

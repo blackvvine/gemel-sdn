@@ -358,7 +358,13 @@
       state: directory
       owner: snort
       group: snort
-      mode: 775
+      mode: '775'
+
+  - name: fix log dir permissions (1/2)
+    shell: chmod -R 755 /var/log/snort
+
+  - name: fix log dir permissions (2/2)
+    shell: chown -R snort:snort /var/log/snort
 
   - name: add default ping rule
     lineinfile:
@@ -382,7 +388,7 @@
     shell: screen -d -m bash -c 'snort -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort'
 
   - name: run Barnyard in screen
-    shell: screen -d -m bash -c 'sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort'
+    shell: screen -d -S barnyard -m bash -c 'sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort'
 
   - name: allow external MySQL access
     replace:

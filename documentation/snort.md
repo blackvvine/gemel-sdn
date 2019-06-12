@@ -2,25 +2,25 @@
 
 Install requirements:
 
-```
+```bash
 sudo apt-get install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev libnghttp2-dev
 ```
 
 get number of CPU cores (used later for faster makes)
 
-```
+```bash
 threads=$(cat /proc/cpuinfo | grep -E '^processor' | wc -l)
 ```
 
 make workspace directory
 
-```
+```bash
 mkdir -p ~/snort_src
 ```
 
 download and compile DAQ
 
-```
+```bash
 cd ~/snort_src
 wget https://snort.org/downloads/snort/daq-2.0.6.tar.gz
 tar -xvzf daq-2.0.6.tar.gz
@@ -32,7 +32,7 @@ sudo make install
 
 download and install nghttp2
 
-```
+```bash
 cd ~/snort_src
 wget https://github.com/nghttp2/nghttp2/releases/download/v1.17.0/nghttp2-1.17.0.tar.gz
 
@@ -48,7 +48,7 @@ sudo make install
 
 download and install Snort
 
-```
+```bash
 cd ~/snort_src
 wget https://www.snort.org/downloads/archive/snort/snort-2.9.9.0.tar.gz
 tar -xvzf snort-2.9.9.0.tar.gz
@@ -59,14 +59,14 @@ sudo make install
 ```
 
 run ldconfig and link snort directory
-```
+```bash
 sudo ldconfig
 sudo ln -s /usr/local/bin/snort /usr/sbin/snort
 ```
 
 init snort files and directories
 
-```
+```bash
 # Create the snort user and group:
 sudo groupadd snort
 sudo useradd snort -r -s /sbin/nologin -c SNORT_IDS -g snort
@@ -109,8 +109,7 @@ sudo cp * /usr/local/lib/snort_dynamicpreprocessor/
 ```
 
 Update snort.conf
-
-```
+```bash
 sudo sed -i "s/include \$RULE\_PATH/#include \$RULE\_PATH/" /etc/snort/snort.conf
 
 sudo sed -i "s/ipvar HOME_NET any/ipvar HOME_NET 210.0.0.0\/24/" /etc/snort/snort.conf
@@ -123,28 +122,26 @@ sudo sed -i "s/_LIST_PATH \/etc\/snort\/rules/_LIST_PATH \/etc\/snort\/rules\/ip
 ```
 
 test configs:
-```
+```bash
 sudo snort -T -i ens4 -c /etc/snort/snort.conf
 ```
 
 enable afpacket for active filtering
 
-```
+```bash
 echo "config daq: afpacket" >> /etc/snort/snort.conf
 echo "config daq_mode: inline" >> /etc/snort/snort.conf
 ```
 
 create internal interfaces 
 
-```
+```bash
 ovs-vsctl add-port br0 ingress -- set interface ingress type=internal
 ovs-vsctl add-port br0 egress -- set interface egress type=internal
 
 ifconfig ingress up
 ifconfig egress up
 ```
-
-
 
 Then run `enable-gw.sh` and `set-gw.sh` on host and router respectively
 
@@ -179,11 +176,21 @@ run ofctl command:
 # ovs-ofctl add-flow br0 in_port=$vx1,priority=800,actions:output=$int
 ```
 
-Run snort in active mode:
+Run snort in **active mode**:
 
-```
+```bash
 snort -A console -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
 ```
 
+Or, remove `-A` to run it without log to console:
+```bash
+snort -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
+```
+
+Run snort in **passive mode**:
+
+```bash
+snort -A console -u snort -g snort -c /etc/snort/snort.conf -i eth0
+```
 
 
