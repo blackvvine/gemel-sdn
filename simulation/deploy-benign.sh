@@ -6,7 +6,7 @@ cd $DIR
 source $DIR/../base/include.sh
 
 print_help() {
-    echo "{ help under construction }"
+    echo "./deploy-benign.sh <VM NAME>"
 }
 
 REQUIRED_ARGS=1
@@ -18,11 +18,10 @@ REQUIRED_ARGS=1
 }
 
 # parse args
-VM_NAME="$1"
-
+TARGET_VM="$1"
 
 # ===================================================== #
 
-log "Deploying simulation to $VM_NAME"
-SSH root@$VM_NAME "git clone https://github.com/haifa-foundation/haifa_simulation.git /root/haifa_simulation"
+SCP $DIR/scripts root@$TARGET_VM:
 
+SSH root@$TARGET_VM "bash scripts/run-benign.sh"
