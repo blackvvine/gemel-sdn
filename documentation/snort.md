@@ -190,7 +190,12 @@ snort -Q -c /etc/snort/snort.conf -i ingress:egress -u snort -g snort
 Run snort in **passive mode**:
 
 ```bash
-snort -A console -u snort -g snort -c /etc/snort/snort.conf -i eth0
+snort -A console -u snort -g snort -c /etc/snort/snort.conf -i br0-int 
+```
+
+Run barnyard:
+```bash
+sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort
 ```
 
 

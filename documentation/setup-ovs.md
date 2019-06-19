@@ -81,4 +81,10 @@ ifconfig br0-int 210.0.0.101 mtu 1400 up
 **Attention**
 If the internal IP address is changed, you will have to re-install OVS VXLANs. Use `gemel-sdn/provision/scripts/connect.sh` to do that.
 
+For the IPS machine, you also gotta turn on the in/eggress ifaces:
+
+```
+ifconfig ingress up
+ifconfig egress up
+```
 
