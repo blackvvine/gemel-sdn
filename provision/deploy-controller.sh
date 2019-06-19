@@ -6,7 +6,7 @@ cd $DIR
 source $DIR/../base/include.sh
 
 print_help() {
-    echo "{ help under construction }"
+    echo "./deploy-controller.sh NAME [ ZONE ]"
 }
 
 REQUIRED_ARGS=1
@@ -19,12 +19,18 @@ REQUIRED_ARGS=1
 
 # parse args
 NAME="$1"
+ZONE="$2"
+
+if [[ -z "$ZONE" ]]
+then
+    ZONE="us-east1-b"
+fi
 
 
 # ===================================================== #
 
 log "Creating VM $NAME"
-./create-vm.sh $NAME "b"
+./create-vm.sh $NAME "b" $ZONE
 
 wait_for $NAME
 
