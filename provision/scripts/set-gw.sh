@@ -4,6 +4,14 @@ show_help() {
     echo -e "./set-gw.sh [GATEWAY OVERLAY IP]"
 }
 
+get_internal_gw() {
+    ifconfig ens4 | grep -o "inet addr:[0-9.]\+" | grep -o "\([0-9]\+.\)\+" | xargs -Ix echo x1
+}
+
+get_internal_subnet() {
+    ifconfig ens4 | grep -o "inet addr:[0-9.]\+" | grep -o "\([0-9]\+.\)\+" | xargs -Ix echo x0/16
+}
+
 gw_overlay_ip=$1
 
 if [[ -z "$gw_overlay_ip" ]]
@@ -20,9 +28,9 @@ pubkey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLMdueHvybfuxc9/DRGkTGLUpA+lkIJ6a7
 
 echo $pubkey >> ~/.ssh/authorized_keys
 
-sudo ip route add 10.142.0.0/16 via 10.142.0.1 # (google's internal ip range)
+sudo ip route add $(get_internal_subnet) via $(get_internal_gw) # (google's internal ip range)
 sudo route add default gw $gw_overlay_ip # (overlay ip of the gateway host which is used by br0-int)
-sudo route del default gw 10.142.0.1 # delete google default GW
+sudo route del default gw $(get_internal_gw) # delete google default GW
 
 set +x
 
