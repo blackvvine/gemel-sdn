@@ -49,7 +49,7 @@ def get_switch_ofid(host_mac):
     topology = _get_topology()["network-topology"]["topology"][0]
 
     # find host
-    host = [n for n in topology["node"] if n["node-id"] == "host:%s" % host_mac][0]
+    host = [n for n in topology.get("node") if n["node-id"] == "host:%s" % host_mac][0]
 
     # find switch
     attached_switch_port = host["host-tracker-service:attachment-points"][0]["tp-id"]
