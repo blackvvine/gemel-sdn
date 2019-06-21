@@ -9,7 +9,8 @@ get_internal_gw() {
 }
 
 get_internal_subnet() {
-    ifconfig ens4 | grep -o "inet addr:[0-9.]\+" | grep -o "\([0-9]\+.\)\+" | xargs -Ix echo x0/16
+    # ifconfig ens4 | grep -o "inet addr:[0-9.]\+" | grep -o "\([0-9]\+.\)\+" | xargs -Ix echo x0/16
+    echo "10.0.0.0/8"
 }
 
 gw_overlay_ip=$1
@@ -23,10 +24,6 @@ fi
 mkdir -p ~/.ssh
 
 set -x
-
-pubkey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLMdueHvybfuxc9/DRGkTGLUpA+lkIJ6a7+sb5SUWMLDRuzrzEMle7Bg/H6wUd9Qb7E9feZAKmy2PFnc7K4/E45MjhBIHajzr4k1Eo62hnQS3RK4bUiCkqWA4fsADOZsDtb3IpPpoQtqKhyhVxCru0Fhz4+0z2ktJcOiLWRyQfjFtHYxh2nu/L3juPDY0fi09fmAakNfw1L5RfHoJw3XhGuS5lGm4A7SdO7kWUjS48zFNtweR5+5nSB6kgc6sM1qJ+up1XMu8C6MueHqA7N7gha+3YlrajM3hORm0WhqabQHpthwcU0jXw7aiqzkDn5nbkrdf/hYSgolR5JCWK/Xjp blackvvine@BlueSkies"
-
-echo $pubkey >> ~/.ssh/authorized_keys
 
 sudo ip route add $(get_internal_subnet) via $(get_internal_gw) # (google's internal ip range)
 sudo route add default gw $gw_overlay_ip # (overlay ip of the gateway host which is used by br0-int)
