@@ -1,20 +1,26 @@
 #!/usr/bin/env bash
 
+DIR=$(dirname $0)
+
 realpath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
 log() {
-    echo "$(date)" :: INFO :: $@""
-    # echo "$(date --rfc-3339="seconds") :: INFO :: $@"
+    if [[ "$(uname)" == "Linux" ]]
+    then
+        echo "$(date --rfc-3339="seconds") :: INFO :: $@"
+    else
+        echo "$(date) :: INFO :: $@"
+    fi
 }
 
 SSH() {
-    gcloud compute ssh $1 -- $2
+    gcloud compute ssh $1 -- $2 2>> $DIR/../log/stderr.log
 }
 
 SCP() {
-    gcloud compute scp --recurse $1 $2
+    gcloud compute scp --recurse $1 $2 2>> $DIR/../log/stderr.log
 }
 
 wait_for() {
