@@ -30,7 +30,7 @@ def setup_vtn(vtn_name, bridge_name):
     })
 
 
-def _get_topology():
+def get_topology():
     """
     Receives network topology maintained by ODL based
     on SDN host-tracker and LLDM
@@ -46,7 +46,7 @@ def get_switch_ofid(host_mac):
     """
 
     # fetch topology
-    topology = _get_topology()["network-topology"]["topology"][0]
+    topology = get_topology()["network-topology"]["topology"][0]
 
     # find host
     host = [n for n in topology.get("node") if n["node-id"] == "host:%s" % host_mac][0]
