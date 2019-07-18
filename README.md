@@ -1,7 +1,7 @@
 Gemel SDN
 =========
 
-![Egyptian man's best friend](https://answersafrica.com/wp-content/uploads/2013/08/camel-teeth.jpg)
+![Gemel](https://a2-images.myspacecdn.com/images04/12/bf743f21408a4ec8938448a10700602d/full.jpg)
 
 This repository contains scrtipts for provisioning and managing resources on Gemel. The componenets are:
 
@@ -33,4 +33,5 @@ TODOs before using the scripts:
 * `pip install beautifulsoup4`
 * For OS X, run `brew install coreutils`
 
+See [wiki](https://github.com/simorgh-project/gemel-sdn/wiki/) for more info.
 
