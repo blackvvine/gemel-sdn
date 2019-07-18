@@ -1,7 +1,7 @@
 Gemel SDN
 =========
 
-![Gemel](https://a2-images.myspacecdn.com/images04/12/bf743f21408a4ec8938448a10700602d/full.jpg | width=100)
+<img src="https://a2-images.myspacecdn.com/images04/12/bf743f21408a4ec8938448a10700602d/full.jpg" width="400"></img>
 
 This repository contains scrtipts for provisioning and managing resources on Gemel. The componenets are:
 
