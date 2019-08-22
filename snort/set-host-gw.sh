@@ -43,5 +43,5 @@ HOST_IP=$(gcloud compute instances list | grep $HOST | awk '{ print $4 }')
 log "Internal IP of the host is $HOST_IP"
 
 log "Setting new routes for host $HOST"
-SSH root@$GATEWAY -- ssh -i /root/.ssh/gw -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$HOST_IP" "./scripts/set-gw.sh 210.0.0.200"
+SSH root@$GATEWAY "ssh -i /root/.ssh/gw -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \"$HOST_IP\" \"./scripts/set-gw.sh 210.0.0.200\""
 

@@ -16,11 +16,11 @@ log() {
 }
 
 SSH() {
-    gcloud compute ssh $1 -- $2 2>> $DIR/../log/stderr.log
+    gcloud compute ssh $1 -- $2 # 2>> $DIR/../log/stderr.log
 }
 
 SCP() {
-    gcloud compute scp --recurse $1 $2 2>> $DIR/../log/stderr.log
+    gcloud compute scp --recurse $1 $2 # 2>> $DIR/../log/stderr.log
 }
 
 wait_for() {
@@ -38,7 +38,10 @@ wait_for() {
             break
         fi
 
+        sleep 1
+
     done
 
 }
+
 

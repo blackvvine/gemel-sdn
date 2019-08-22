@@ -29,7 +29,7 @@ then
     ZONE="us-east1-b"
 fi
 
-if [[ -z ${VM_TYPE+x} ]] 
+if [[ -z "${VM_TYPE}" ]]
 then
     VM_TYPE="a"
 fi
