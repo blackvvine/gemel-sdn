@@ -1,5 +1,5 @@
 
-ODL_BASE_URL = "http://odl.einstein.eeman.me"
+ODL_BASE_URL = "http://localhost"
 
 ODL_VTN_API_URL = f"{ODL_BASE_URL}:8181/restconf/operations"
 
