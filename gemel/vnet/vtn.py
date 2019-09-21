@@ -60,22 +60,24 @@ def get_switch_ofid(host_mac):
     return switch_id, switch_port_id
 
 
-def _new_iface_name(vtn_name):
+def _new_iface_name(vtn_name, host_mac):
     """
     Determines what the next interface name should be in
     a given VTN
     """
 
-    vtn = _get_vtn_info(vtn_name)
+    return "%si%s" % (vtn_name, host_mac.split(":")[-1])
 
-    # get interface names
-    interface_names = [i["name"] for i in vtn["vbridge"][0].get("vinterface", [{"name": "vtn0i0"}])]
+    # vtn = _get_vtn_info(vtn_name)
 
-    # get max interface number in names
-    _max = max([int(re.match(r"[\d\w]+\w(\d+)", name).group(1)) for name in interface_names])
+    # # get interface names
+    # interface_names = [i["name"] for i in vtn["vbridge"][0].get("vinterface", [{"name": "vtn0i0"}])]
 
-    # generate name in the format: "<VTN NAME>i<incremental number>"
-    return "%si%d" % (vtn_name, _max + 1)
+    # # get max interface number in names
+    # _max = max([int(re.match(r"[\d\w]+\w(\d+)", name).group(1)) for name in interface_names])
+
+    # # generate name in the format: "<VTN NAME>i<incremental number>"
+    # return "%si%d" % (vtn_name, _max + 1)
 
 
 def _get_vtn_info(vtn_name):
@@ -110,6 +112,28 @@ def get_current_interface(host_mac):
                 return vnet["name"], interface["name"], vnet["vbridge"][0]["name"]
 
     return None
+
+
+def unset_vnet(host_mac):
+    """
+    Removes a given host from the VTN to which it is
+    connected
+    """
+
+    vtn, iface, vbr = get_current_interface(host_mac)
+    logger.info("Host currently connected to %s (iface %s on %s)", vtn, iface, vbr)
+
+    vtn_api_post("/vtn-port-map:remove-port-map", data={
+        "input": {
+            "tenant-name": vtn,
+            "bridge-name": vbr,
+            "interface-name": iface
+        }
+    })
+
+    logger.info("Successfully unmapped %s from %s", host_mac, iface)
+
+    return vtn
 
 
 def remove_from_vtn(host_mac):
@@ -147,7 +171,7 @@ def connect_to_vtn(host_mac, vtn):
     logger.info("Entry switch: %s port %s", switch_id, port_id)
 
     # generate new incremental name
-    iface_name = _new_iface_name(vtn)
+    iface_name = _new_iface_name(vtn, host_mac)
 
     vtn_api_post("/vtn-vinterface:update-vinterface", data={
         "input": {
@@ -175,11 +199,11 @@ def connect_to_vtn(host_mac, vtn):
 def reassign_vtn(host_mac, new_vtn_name, safe=False):
     if safe:
         if get_current_interface(host_mac):
-            remove_from_vtn(host_mac)
+            unset_vnet(host_mac)
         else:
             logger.info("Host %s not assigned to any VTNs", host_mac)
     else:
-        remove_from_vtn(host_mac)
+        unset_vnet(host_mac)
     connect_to_vtn(host_mac, new_vtn_name)
 
 
